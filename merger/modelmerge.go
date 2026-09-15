@@ -54,6 +54,7 @@ func MergeEvent(ctx context.Context, left, right *model.Event) *model.Event {
 	result.StartTime = MergeOptionalInt64(ctx, left.StartTime, right.StartTime)
 	result.BettingStatus = MergeOptionalBettingStatus(ctx, left.BettingStatus, right.BettingStatus)
 	result.SportData = MergeSportEvent(ctx, left.SportData, right.SportData)
+	result.Hidden = MergeOptionalBool(ctx, left.Hidden, right.Hidden)
 
 	// Generate the difference for Markets with a slice of Market
 	mergedMarkets := MergeMarketSlice(ctx, left.Markets, right.Markets)
@@ -184,6 +185,25 @@ func MergeOptionalInt64(ctx context.Context, left, right *model.OptionalInt64) *
 
 	// Create the new target
 	result := &model.OptionalInt64{}
+
+	result.Value = right.Value     // Copy primitive value from right, as non-pointers.
+	result.Deleted = right.Deleted // Copy primitive value from right, as non-pointers.
+	return result
+}
+
+// MergeOptionalBool generates a new instance of the OptionalBool type, where two input values are merged. Values on the left
+// are overwritten with values from the right where they exist, recursively.
+func MergeOptionalBool(ctx context.Context, left, right *model.OptionalBool) *model.OptionalBool {
+	// Handle trivial cases
+	if right == nil {
+		return left
+	}
+	if left == nil {
+		return right
+	}
+
+	// Create the new target
+	result := &model.OptionalBool{}
 
 	result.Value = right.Value     // Copy primitive value from right, as non-pointers.
 	result.Deleted = right.Deleted // Copy primitive value from right, as non-pointers.

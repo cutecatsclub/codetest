@@ -1,0 +1,5 @@
+# Task 1 - hidden field flag
+
+This new field was added as an `OptionalBool` instead of just a `bool` so that partial updates do not reset the value. Used `Hidden` as the name to make it backward compatible by default, events that have never been sent `Hidden` are not hidden so existing events and feeds are unaffected. This is a flag instead of a filter, `GetSportEvent` still returns hidden events and consumers decide what to show.
+
+Testing was done two ways with Redis running (`docker compose up -d`). `TestService_IntegrationTest_HiddenFlag` runs `Update` and `GetSportEvent` end to end (`go test ./core/service/ -run HiddenFlag -v -count=1`). It was also tested in Postman against the running service by loading `core/core.proto` with the repo root added under Import paths, as server reflection can't resolve `model/event.proto`. Sending `01_new_event.json`, `03_hide_event.json` and then `02_open_selection.json` to `Update`, `GetSportEvent` returned `Hidden` false, then true, and still true after the unrelated update, with Redis Commander showing `"Hidden":{"Value":true}` stored.

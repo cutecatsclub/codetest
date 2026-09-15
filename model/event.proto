@@ -25,6 +25,7 @@ message Event {
     repeated Market         Markets         = 5; 
     OptionalString          EventTypeID     = 6; 
     SportEvent              SportData       = 7;
+    OptionalBool            Hidden          = 8;
 }
 
 // SportEvent models event details that are specific to sports
@@ -65,4 +66,9 @@ message OptionalDouble {
 message OptionalInt64 {
     int64 Value   = 1;
     bool  Deleted = 2;
+}
+
+message OptionalBool {
+    bool Value   = 1;
+    bool Deleted = 2;
 }
