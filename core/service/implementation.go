@@ -11,6 +11,8 @@ import (
 	"git.neds.sh/technology/pricekinetics/tools/codetest/merger"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Upstreams defines dependencies the service has on other services
@@ -93,4 +95,30 @@ func (host *Service) GetSportEvent(ctx context.Context, req *core.GetSportEventR
 	resp.Event = rslt
 
 	return resp, nil
+}
+
+// GetRacingEvent retrieves a model.Event from the database and returns a core.RacingEvent - this is a more UserConsumable representation of the model that is specific to racing events
+func (host *Service) GetRacingEvent(ctx context.Context, req *core.GetRacingEventRequest) (*core.GetRacingEventResponse, error) {
+	// an empty ID is a malformed request, and Update does not reject empty IDs so it could match an event stored under an empty key
+	if req.GetEventID() == "" {
+		return nil, status.Error(codes.InvalidArgument, "EventID is required")
+	}
+
+	existing, err := host.Upstreams.Repo.GetEventByID(ctx, req.GetEventID())
+	if err != nil {
+		logrus.WithError(err).Error("GetRacingEvent: failed to retrieve event")
+		return nil, status.Error(codes.Internal, "failed to retrieve event")
+	}
+
+	if existing == nil {
+		return nil, status.Errorf(codes.NotFound, "event %v not found", req.GetEventID())
+	}
+	if existing.GetRacingData() == nil {
+		return nil, status.Errorf(codes.NotFound, "event %v is not a racing event", req.GetEventID())
+	}
+
+	rslt := &core.RacingEvent{}
+	rslt.ConvertFromModel(existing)
+
+	return &core.GetRacingEventResponse{Event: rslt}, nil
 }
