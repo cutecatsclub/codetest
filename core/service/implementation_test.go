@@ -8,6 +8,7 @@ import (
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/repository"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/service"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms"
+	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms/racingtransform"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms/sporttransform"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/merger"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
@@ -25,6 +26,7 @@ func TestService_IntegrationTest_NewEvent(t *testing.T) {
 			Repo:         repo,
 			Transforms: []transforms.TransformClient{
 				sporttransform.NewSportTransformClient(),
+				racingtransform.NewRacingTransformClient(),
 			},
 		},
 	}
@@ -78,6 +80,7 @@ func TestService_IntegrationTest_HiddenFlag(t *testing.T) {
 			Repo:         repo,
 			Transforms: []transforms.TransformClient{
 				sporttransform.NewSportTransformClient(),
+				racingtransform.NewRacingTransformClient(),
 			},
 		},
 	}
