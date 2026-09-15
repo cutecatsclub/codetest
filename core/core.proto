@@ -33,6 +33,7 @@ message SportEvent {
     string                  Region          = 8;
     string                  League          = 9;
     string                  Round           = 11;
+    bool                    Hidden          = 12;
 }
 
 service Service {
