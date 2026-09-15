@@ -1,0 +1,15 @@
+{
+    "Event": {
+        "ID": "testRace",
+        "RacingData": {
+            "Runners": [
+                {
+                    "ID": "r2",
+                    "Scratched": {
+                        "Value": true
+                    }
+                }
+            ]
+        }
+    }
+}

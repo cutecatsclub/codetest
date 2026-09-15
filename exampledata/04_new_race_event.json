@@ -1,0 +1,198 @@
+{
+    "Event": {
+        "Markets": [
+            {
+                "ID": "win",
+                "Name": {
+                    "Value": "Win"
+                },
+                "BettingStatus": {
+                    "Value": "BettingOpen"
+                },
+                "Selections": [
+                    {
+                        "ID": "r1",
+                        "Name": {
+                            "Value": "Thunder Road"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 3.50
+                        }
+                    },
+                    {
+                        "ID": "r2",
+                        "Name": {
+                            "Value": "Coastal Breeze"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 5.00
+                        }
+                    },
+                    {
+                        "ID": "r3",
+                        "Name": {
+                            "Value": "Midnight Express"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 8.00
+                        }
+                    }
+                ]
+            },
+            {
+                "ID": "place",
+                "Name": {
+                    "Value": "Place"
+                },
+                "BettingStatus": {
+                    "Value": "BettingOpen"
+                },
+                "Selections": [
+                    {
+                        "ID": "r1",
+                        "Name": {
+                            "Value": "Thunder Road"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 1.50
+                        }
+                    },
+                    {
+                        "ID": "r2",
+                        "Name": {
+                            "Value": "Coastal Breeze"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 1.90
+                        }
+                    },
+                    {
+                        "ID": "r3",
+                        "Name": {
+                            "Value": "Midnight Express"
+                        },
+                        "BettingStatus": {
+                            "Value": "BettingOpen"
+                        },
+                        "Price": {
+                            "Value": 2.60
+                        }
+                    }
+                ]
+            }
+        ],
+        "ID": "testRace",
+        "Name": {
+            "Value": "Flemington Race 7"
+        },
+        "StartTime": {
+            "Value": 1758142685635000000
+        },
+        "BettingStatus": {
+            "Value": "BettingOpen"
+        },
+        "EventTypeID": {
+            "Value": "horse_racing"
+        },
+        "RacingData": {
+            "Venue": {
+                "Value": "Flemington"
+            },
+            "Region": {
+                "Value": "Australia"
+            },
+            "RaceNumber": {
+                "Value": 7
+            },
+            "Distance": {
+                "Value": 1200
+            },
+            "TrackCondition": {
+                "Value": "Good 4"
+            },
+            "RaceClass": {
+                "Value": "Group 1"
+            },
+            "Runners": [
+                {
+                    "ID": "r1",
+                    "Name": {
+                        "Value": "Thunder Road"
+                    },
+                    "Number": {
+                        "Value": 1
+                    },
+                    "Barrier": {
+                        "Value": 5
+                    },
+                    "Jockey": {
+                        "Value": "J Walker"
+                    },
+                    "Trainer": {
+                        "Value": "A Hart"
+                    },
+                    "Weight": {
+                        "Value": 58.5
+                    }
+                },
+                {
+                    "ID": "r2",
+                    "Name": {
+                        "Value": "Coastal Breeze"
+                    },
+                    "Number": {
+                        "Value": 2
+                    },
+                    "Barrier": {
+                        "Value": 1
+                    },
+                    "Jockey": {
+                        "Value": "K Ellis"
+                    },
+                    "Trainer": {
+                        "Value": "B Lane"
+                    },
+                    "Weight": {
+                        "Value": 57
+                    }
+                },
+                {
+                    "ID": "r3",
+                    "Name": {
+                        "Value": "Midnight Express"
+                    },
+                    "Number": {
+                        "Value": 3
+                    },
+                    "Barrier": {
+                        "Value": 8
+                    },
+                    "Jockey": {
+                        "Value": "M Chen"
+                    },
+                    "Trainer": {
+                        "Value": "D Ross"
+                    },
+                    "Weight": {
+                        "Value": 55.5
+                    }
+                }
+            ]
+        }
+    }
+}
