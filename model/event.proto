@@ -26,6 +26,19 @@ message Event {
     OptionalString          EventTypeID     = 6; 
     SportEvent              SportData       = 7;
     OptionalBool            Hidden          = 8;
+    RacingEvent             RacingData      = 9;
+}
+
+// RacingEvent models event details specific to horse, greyhound and harness racing
+message RacingEvent {
+    OptionalString  RaceType       = 1; // display name, set by RacingTransform e.g "Horse Racing"
+    OptionalString  Venue          = 2; // e.g "Flemington"
+    OptionalString  Region         = 3;
+    OptionalInt64   RaceNumber     = 4;
+    OptionalInt64   Distance       = 5; // metres
+    OptionalString  TrackCondition = 6; // e.g "Good 4"
+    OptionalString  RaceClass      = 7; // e.g "Group 1", "Maiden"
+    repeated Runner Runners        = 8;
 }
 
 // SportEvent models event details that are specific to sports
@@ -34,6 +47,18 @@ message SportEvent {
     OptionalString Region   = 2; 
     OptionalString League   = 3; 
     OptionalString Round    = 4; 
+}
+
+// Runner models a competitor in a race - Runner.ID matches Selection.ID in each market
+message Runner {
+    string         ID        = 1;
+    OptionalString Name      = 2;
+    OptionalInt64  Number    = 3; // saddlecloth / rug number
+    OptionalInt64  Barrier   = 4; // barrier (horse/harness) or box (greyhound)
+    OptionalString Jockey    = 5; // driver for harness
+    OptionalString Trainer   = 6;
+    OptionalDouble Weight    = 7; // kg, horse racing only
+    OptionalBool   Scratched = 8;
 }
 
 // Market models a market of betting options e.g Head to Head or Totals
