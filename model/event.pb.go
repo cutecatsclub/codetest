@@ -489,6 +489,7 @@ type Market struct {
 	StartTime     *OptionalInt64         `protobuf:"bytes,3,opt,name=StartTime,proto3" json:"StartTime,omitempty"`
 	BettingStatus *OptionalBettingStatus `protobuf:"bytes,4,opt,name=BettingStatus,proto3" json:"BettingStatus,omitempty"`
 	Selections    []*Selection           `protobuf:"bytes,5,rep,name=Selections,proto3" json:"Selections,omitempty"`
+	ClosedAt      *OptionalInt64         `protobuf:"bytes,6,opt,name=ClosedAt,proto3" json:"ClosedAt,omitempty"` // unix nanoseconds, set by MarketTransform the first time the market is closed
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -553,6 +554,13 @@ func (x *Market) GetSelections() []*Selection {
 	return nil
 }
 
+func (x *Market) GetClosedAt() *OptionalInt64 {
+	if x != nil {
+		return x.ClosedAt
+	}
+	return nil
+}
+
 func (x *Market) SetID(v string) {
 	x.ID = v
 }
@@ -571,6 +579,10 @@ func (x *Market) SetBettingStatus(v *OptionalBettingStatus) {
 
 func (x *Market) SetSelections(v []*Selection) {
 	x.Selections = v
+}
+
+func (x *Market) SetClosedAt(v *OptionalInt64) {
+	x.ClosedAt = v
 }
 
 func (x *Market) HasName() bool {
@@ -594,6 +606,13 @@ func (x *Market) HasBettingStatus() bool {
 	return x.BettingStatus != nil
 }
 
+func (x *Market) HasClosedAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.ClosedAt != nil
+}
+
 func (x *Market) ClearName() {
 	x.Name = nil
 }
@@ -606,6 +625,10 @@ func (x *Market) ClearBettingStatus() {
 	x.BettingStatus = nil
 }
 
+func (x *Market) ClearClosedAt() {
+	x.ClosedAt = nil
+}
+
 type Market_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -614,6 +637,7 @@ type Market_builder struct {
 	StartTime     *OptionalInt64
 	BettingStatus *OptionalBettingStatus
 	Selections    []*Selection
+	ClosedAt      *OptionalInt64
 }
 
 func (b0 Market_builder) Build() *Market {
@@ -625,6 +649,7 @@ func (b0 Market_builder) Build() *Market {
 	x.StartTime = b.StartTime
 	x.BettingStatus = b.BettingStatus
 	x.Selections = b.Selections
+	x.ClosedAt = b.ClosedAt
 	return m0
 }
 
@@ -995,7 +1020,7 @@ const file_event_proto_rawDesc = "" +
 	"\x04Name\x18\x01 \x01(\v2\x15.model.OptionalStringR\x04Name\x12-\n" +
 	"\x06Region\x18\x02 \x01(\v2\x15.model.OptionalStringR\x06Region\x12-\n" +
 	"\x06League\x18\x03 \x01(\v2\x15.model.OptionalStringR\x06League\x12+\n" +
-	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\"\xed\x01\n" +
+	"\x05Round\x18\x04 \x01(\v2\x15.model.OptionalStringR\x05Round\"\x9f\x02\n" +
 	"\x06Market\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x122\n" +
@@ -1003,7 +1028,8 @@ const file_event_proto_rawDesc = "" +
 	"\rBettingStatus\x18\x04 \x01(\v2\x1c.model.OptionalBettingStatusR\rBettingStatus\x120\n" +
 	"\n" +
 	"Selections\x18\x05 \x03(\v2\x10.model.SelectionR\n" +
-	"Selections\"\xb7\x01\n" +
+	"Selections\x120\n" +
+	"\bClosedAt\x18\x06 \x01(\v2\x14.model.OptionalInt64R\bClosedAt\"\xb7\x01\n" +
 	"\tSelection\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12)\n" +
 	"\x04Name\x18\x02 \x01(\v2\x15.model.OptionalStringR\x04Name\x12B\n" +
@@ -1053,14 +1079,15 @@ var file_event_proto_depIdxs = []int32{
 	8,  // 12: model.Market.StartTime:type_name -> model.OptionalInt64
 	1,  // 13: model.Market.BettingStatus:type_name -> model.OptionalBettingStatus
 	5,  // 14: model.Market.Selections:type_name -> model.Selection
-	6,  // 15: model.Selection.Name:type_name -> model.OptionalString
-	1,  // 16: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
-	7,  // 17: model.Selection.Price:type_name -> model.OptionalDouble
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	8,  // 15: model.Market.ClosedAt:type_name -> model.OptionalInt64
+	6,  // 16: model.Selection.Name:type_name -> model.OptionalString
+	1,  // 17: model.Selection.BettingStatus:type_name -> model.OptionalBettingStatus
+	7,  // 18: model.Selection.Price:type_name -> model.OptionalDouble
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_event_proto_init() }
