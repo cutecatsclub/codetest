@@ -5,6 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"slices"
+	"time"
 
 	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
 	"github.com/sirupsen/logrus"
@@ -33,6 +36,17 @@ func NewMongoRepository(ctx context.Context, uri string, database string, collec
 	if !rslt.HealthCheck(ctx) {
 		_ = client.Disconnect(ctx)
 		return nil, fmt.Errorf("failed_to_init_mongo")
+	}
+
+	// Indexes for SearchEvents, including _id so results can be sorted from the index. Indexes that already exist are left as they are
+	_, err = rslt.events.Indexes().CreateMany(ctx, []mongo.IndexModel{
+		{Keys: bson.D{{Key: "StartTime.Value", Value: 1}, {Key: "_id", Value: 1}}},
+		{Keys: bson.D{{Key: "BettingStatus.Value", Value: 1}, {Key: "StartTime.Value", Value: 1}, {Key: "_id", Value: 1}}},
+	})
+	if err != nil {
+		logrus.Errorf("could not create MongoDB indexes: %v", err)
+		_ = client.Disconnect(ctx)
+		return nil, err
 	}
 
 	return rslt, nil
@@ -78,4 +92,68 @@ func (c *mongoRepo) DeleteEventByID(ctx context.Context, id string) error {
 	}
 
 	return err
+}
+
+func (c *mongoRepo) SearchEvents(ctx context.Context, filter EventFilter) ([]*model.Event, error) {
+	// Zero values aren't stored and a Deleted value counts as unset, the same as GetRacingEvent, e.g an event that isn't hidden has no Hidden.Value
+	conditions := bson.A{}
+
+	if filter.StartTimeFrom != nil || filter.StartTimeTo != nil {
+		startTime := bson.M{}
+		if filter.StartTimeFrom != nil {
+			startTime["$gte"] = unixNano(*filter.StartTimeFrom)
+		}
+		if filter.StartTimeTo != nil {
+			startTime["$lt"] = unixNano(*filter.StartTimeTo)
+		}
+		conditions = append(conditions, bson.M{"StartTime.Value": startTime, "StartTime.Deleted": bson.M{"$ne": true}})
+	}
+
+	if len(filter.BettingStatuses) > 0 {
+		anyStatus := bson.A{bson.M{"BettingStatus.Value": bson.M{"$in": filter.BettingStatuses}, "BettingStatus.Deleted": bson.M{"$ne": true}}}
+		if slices.Contains(filter.BettingStatuses, model.BettingStatus_BettingUnknown) {
+			// BettingUnknown is the zero value so it is never stored, match events without a status or with a Deleted one
+			anyStatus = append(anyStatus, bson.M{"BettingStatus.Value": nil}, bson.M{"BettingStatus.Deleted": true})
+		}
+		conditions = append(conditions, bson.M{"$or": anyStatus})
+	}
+
+	if filter.Hidden != nil {
+		hidden := bson.M{"Hidden.Value": true, "Hidden.Deleted": bson.M{"$ne": true}}
+		if *filter.Hidden {
+			conditions = append(conditions, hidden)
+		} else {
+			conditions = append(conditions, bson.M{"$nor": bson.A{hidden}})
+		}
+	}
+
+	query := bson.M{}
+	if len(conditions) > 0 {
+		query["$and"] = conditions
+	}
+
+	cursor, err := c.events.Find(ctx, query, options.Find().SetSort(bson.D{{Key: "StartTime.Value", Value: 1}, {Key: "_id", Value: 1}}))
+	if err != nil {
+		logrus.Errorf("could not search events %v", err)
+		return nil, err
+	}
+
+	events := []*model.Event{}
+	if err := cursor.All(ctx, &events); err != nil {
+		logrus.Errorf("could not decode events %v", err)
+		return nil, err
+	}
+
+	return events, nil
+}
+
+// unixNano converts t to unix nanoseconds like the model's StartTime, clamping times that are too far from 1970 to fit in an int64
+func unixNano(t time.Time) int64 {
+	if t.Before(time.Unix(0, math.MinInt64)) {
+		return math.MinInt64
+	}
+	if t.After(time.Unix(0, math.MaxInt64)) {
+		return math.MaxInt64
+	}
+	return t.UnixNano()
 }
