@@ -19,7 +19,7 @@ import (
 )
 
 func TestService_IntegrationTest_NewEvent(t *testing.T) {
-	repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest", "events")
 	assert.NoError(t, err)
 	defer repo.DeleteEventByID(context.Background(), "integration-test-1")
 	host := &service.Service{
@@ -72,7 +72,7 @@ func TestService_IntegrationTest_HiddenFlag(t *testing.T) {
 	ctx := context.Background()
 	const id = "integration-test-hidden"
 
-	repo, err := repository.NewRedisRepository(ctx, "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(ctx, "mongodb://localhost:27017", "codetest", "events")
 	require.NoError(t, err)
 	defer repo.DeleteEventByID(ctx, id)
 
@@ -116,7 +116,7 @@ func TestService_IntegrationTest_RacingEvent(t *testing.T) {
 	const id = "integration-test-racing"
 	const soccerID = "integration-test-racing-soccer"
 
-	repo, err := repository.NewRedisRepository(ctx, "localhost:6379", "")
+	repo, err := repository.NewMongoRepository(ctx, "mongodb://localhost:27017", "codetest", "events")
 	require.NoError(t, err)
 	defer repo.DeleteEventByID(ctx, id)
 	defer repo.DeleteEventByID(ctx, soccerID)
