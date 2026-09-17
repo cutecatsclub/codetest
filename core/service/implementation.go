@@ -4,11 +4,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/repository"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/core/transforms"
 	"git.neds.sh/technology/pricekinetics/tools/codetest/merger"
+	"git.neds.sh/technology/pricekinetics/tools/codetest/model"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -121,4 +123,57 @@ func (host *Service) GetRacingEvent(ctx context.Context, req *core.GetRacingEven
 	rslt.ConvertFromModel(existing)
 
 	return &core.GetRacingEventResponse{Event: rslt}, nil
+}
+
+// SearchEvents retrieves every model.Event that matches all of the criteria set on the request - at least one is required
+func (host *Service) SearchEvents(ctx context.Context, req *core.SearchEventsRequest) (*core.SearchEventsResponse, error) {
+	// with no criteria this would return every event in the database
+	if req.GetStartTimeFrom() == "" && req.GetStartTimeTo() == "" && len(req.GetBettingStatuses()) == 0 && req.GetHidden() == nil {
+		return nil, status.Error(codes.InvalidArgument, "at least one of StartTimeFrom, StartTimeTo, BettingStatuses or Hidden is required")
+	}
+
+	filter := repository.EventFilter{BettingStatuses: req.GetBettingStatuses()}
+
+	var err error
+	if filter.StartTimeFrom, err = searchTime("StartTimeFrom", req.GetStartTimeFrom()); err != nil {
+		return nil, err
+	}
+	if filter.StartTimeTo, err = searchTime("StartTimeTo", req.GetStartTimeTo()); err != nil {
+		return nil, err
+	}
+	if filter.StartTimeFrom != nil && filter.StartTimeTo != nil && !filter.StartTimeFrom.Before(*filter.StartTimeTo) {
+		return nil, status.Error(codes.InvalidArgument, "StartTimeFrom must be before StartTimeTo")
+	}
+
+	// proto3 enums accept any number, so reject statuses that don't exist
+	for _, s := range filter.BettingStatuses {
+		if _, ok := model.BettingStatus_name[int32(s)]; !ok {
+			return nil, status.Errorf(codes.InvalidArgument, "unknown BettingStatus %v", s)
+		}
+	}
+
+	if req.GetHidden() != nil {
+		hidden := req.GetHidden().GetValue()
+		filter.Hidden = &hidden
+	}
+
+	events, err := host.Upstreams.Repo.SearchEvents(ctx, filter)
+	if err != nil {
+		logrus.WithError(err).Error("SearchEvents: failed to search events")
+		return nil, status.Error(codes.Internal, "failed to search events")
+	}
+
+	return &core.SearchEventsResponse{Events: events}, nil
+}
+
+// searchTime parses an optional RFC3339 time from a search request, the same format StartTime is returned in, returning InvalidArgument if it isn't valid
+func searchTime(name string, value string) (*time.Time, error) {
+	if value == "" {
+		return nil, nil
+	}
+	t, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "%v must be an RFC3339 time e.g 2025-09-19T00:00:00+10:00", name)
+	}
+	return &t, nil
 }

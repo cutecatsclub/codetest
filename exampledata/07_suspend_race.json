@@ -1,0 +1,8 @@
+{
+    "Event": {
+        "ID": "testRace",
+        "BettingStatus": {
+            "Value": "BettingSuspended"
+        }
+    }
+}

@@ -74,6 +74,17 @@ message Runner {
     bool    Scratched   = 8;
 }
 
+message SearchEventsRequest {
+    string                          StartTimeFrom   = 1; // RFC3339, inclusive
+    string                          StartTimeTo     = 2; // RFC3339, exclusive
+    repeated model.BettingStatus    BettingStatuses = 3; // matches any of these
+    model.OptionalBool              Hidden          = 4; // unset matches both hidden and shown events
+}
+
+message SearchEventsResponse {
+    repeated model.Event Events = 1; // ordered by StartTime
+}
+
 service Service {
     // Update updates an Event and runs the pipeline of transformations
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
@@ -81,4 +92,6 @@ service Service {
     rpc GetSportEvent(GetSportEventRequest) returns (GetSportEventResponse) {}
     // GetRacingEvent retrieves a model.Event from the database and returns a core.RacingEvent - this is a more UserConsumable representation of the model that is specific to racing events
     rpc GetRacingEvent(GetRacingEventRequest) returns (GetRacingEventResponse) {}
+    // SearchEvents retrieves every model.Event that matches all of the criteria set on the request - at least one is required
+    rpc SearchEvents(SearchEventsRequest) returns (SearchEventsResponse) {}
 }
