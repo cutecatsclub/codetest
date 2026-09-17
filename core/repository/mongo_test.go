@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_redisRepo_UpdateEvent(t *testing.T) {
-	repo, err := NewRedisRepository(context.Background(), "localhost:6379", "")
+func Test_mongoRepo_UpdateEvent(t *testing.T) {
+	repo, err := NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest", "events")
 	assert.NoError(t, err)
 	input := &model.Event{
 		ID:            "e001",

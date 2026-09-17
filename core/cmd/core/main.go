@@ -38,7 +38,7 @@ func main() {
 	app.Action = func(_ *cli.Context) error {
 		log.SetFormatter(&log.TextFormatter{})
 
-		repo, err := repository.NewRedisRepository(context.Background(), "localhost:6379", "")
+		repo, err := repository.NewMongoRepository(context.Background(), "mongodb://localhost:27017", "codetest", "events")
 		if err != nil {
 			return err
 		}
